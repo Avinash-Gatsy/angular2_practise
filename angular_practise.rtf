@@ -1,0 +1,573 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red255\green255\blue0;\red217\green11\blue0;\red255\green0\blue0;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Go to the angular package , where we have the  package.json file to install the dependencies run npm install by pointing to that directory\
+\
+"start": "concurrent \\"npm run tsc:w\\" \\"npm run lite\\" ",\
+\
+concurrently running 2 commands \
+\\"npm run tsc:w\\"   -  run typescripts in watch mode , it compiles the .ts files to .js\
+\\"npm run lite\\"   - run the lite web server\
+\
+npm start -  opens in the default web browser\
+to open in other browser - http://localhost:3000\
+\
+http://stackoverflow.com/questions/33332394/angular-2-typescript-cant-find-names\
+\
+xyz.js\
+xyz.ts\
+xyz.js.map - this helps in debugging , when we debug from UI  this helps in mapping to the corresponding line in the ts file\
+\
+Angular typescript classes - components\
+\
+browser sync is a node module which the lite web server uses, hence when we change the ts files and run in watch mode , the compiler updates js and js.map files and the browser automatically syncs with the changes \
+\
+grunt or gulp can be used to include .ts compiler in the build.\
+\
+component - encapsulates the template,data and view logic\
+directive - used to modify DOM elements\
+router - \
+service - used to encapsulate non-UI logic\
+\
+in the .ts files we start with export : we export the class, variables etc to be used by other modules\
+\
+Angular decorator : annotations in java \
+to declare the .ts class as a component we need to .\
+import \{Component\} from 'angular2/core';\
+\
+components are functions\
+@Component(\{\
+	selector : \'92String\'92 - this specifies a css selector as a HTML element\
+	template: \'91 \'91 - this will be the HTML that will be rendered into the DOM when the component view is rendered\
+	directives: [ ] - this will be an array ,where we can specify the components used in template used for this component\
+\})\
+\
+** We use directives to extend or control DOM\
+we can define custom attributes r custom elements that are not part of standard HTML\
+eg. <input expandable/>\
+<courses/>\
+every component is a directive, only diff is that a component has a template but a directive dosent\
+\
+import \{CoursesComponent\} from './courses.component' - import the custom module from local directory, * note don\'92t import using the .ts extension\
+\
+interpolation\
+we can define properties and display them in the template\
+\
+template: \'91 \'91    change the single quote\'92 to backtick` which will allow to break the template to multiple lines as shown below.\
+\
+@Component(\{\
+    selector: 'courses',\
+    template: `\
+    <h2>Courses</h2>\
+    \{\{title\}\}\
+    `\
+\})\
+export class CoursesComponent\{\
+title: String =" The title of courses page"\
+\}\
+\
+if the value of property in the component changes, the view will be automatically refreshed - one way binding\
+2 way binding - when we enter in the input field in forms, the property will change which will get updated in the view as well\
+\
+@Component(\{\
+    selector: 'courses',\
+    template: `\
+    <h2>Courses</h2>\
+    \{\{title\}\}\
+    <ul>\
+    <li *ngFor=\'93#course of courses">\
+    \{\{course\}\}\
+    </li>\
+    </ul>\
+    `\
+\})\
+export class CoursesComponent\{\
+title: String =" The title of courses page"\
+courses =  ["course1","course2","course3"]\
+\}\
+\
+we iterate for each value of the string in courses string array using the <li *ngFor=\'93#course of Courses">\
+*course is a local variable which stores the value of string for every iteration in courses.\
+\
+SERVICE\
+export class CourseService\{\
+    getCourses():String[] \{  //we can explicitly define the return type , here it is String[]\
+    return  ["course1","course2","course3"];\
+    \}\
+\}\
+getCourses() - //method\
+\
+Note Component shouldn\'92t have any code to get the data from the server, it should be in service\
+import \{CourseService\} from './course.service' 	//import the service into the component\
+\
+once we import it we need a reference to the service , one way to do it ,is to create a constructor in the courses component. \
+\
+constructor()\{\
+	new CourseService()\
+\}  	\
+//note this will cause tight coupling between the CourseComponent and CourseService which will be a problem during unit testing as most of the data is obtained from the server using RESTful API.\
+\
+export class CoursesComponent\{\
+title: String =" The title of courses page"\
+courses;\
+constructor(courseService:CourseService)\{	\
+//courseService - any parameter,CourseService - dependency injection\
+\
+\}\
+\}\
+\
+EXCEPTION: No provider for CourseService! (CoursesComponent -> CourseService)\
+\
+CoursesComponent has dependency on CourseService ,but we dint specify how to create that service - *Dependency Injection\
+\
+@Component(\{\
+    selector: 'courses',\
+    template: `\
+    <h2>Courses</h2>\
+    \{\{ title \}\}\
+    <ul>\
+    <li *ngFor="#course of courses">\
+    \{\{ course \}\}\
+    </li>\
+    </ul>\
+    `,\
+    providers:[CourseService]	-	//provides ca  hold any object, in the array we specify the dependencies \
+\})\
+\
+COMPONENT\
+\
+import \{Component\} from 'angular2/core';\
+import \{CourseService\} from './course.service'\
+\
+@Component(\{\
+    selector: 'courses',\
+    template: `\
+    <h2>Courses</h2>\
+    \{\{ title \}\}\
+    <ul>\
+    <li *ngFor="#course of courses">\
+    \{\{ course \}\}\
+    </li>\
+    </ul>\
+    `,\
+    providers:[CourseService]\
+\})\
+export class CoursesComponent\{\
+title: String =" The title of courses page"\
+courses;\
+constructor(courseService:CourseService)\{\
+this.courses = courseService.getCourses();\
+\}\
+\}\
+\
+app.component.ts\
+\
+import \{Component\} from 'angular2/core';\
+import \{CoursesComponent\} from './courses.component'\
+@Component(\{\
+    selector: 'my-app',\
+    template: '<h1>Hi Buddy</h1><courses></courses>',\
+    directives: [CoursesComponent]\
+\})\
+export class AppComponent \{ \}\
+\
+the selector: 'my-app', in the component decorator will be used to render the component the the selector is addressed in the HTML\
+\
+DIRECTIVES\
+<input autoGrow/>\
+\
+@Directive(\{\
+    selector: '[autoGrow]' - // the square brackets indicate applying the directive for a HTML attribute\
+ host:\{\
+        '(focus)':'onFocus()',\
+        '(blur)':'onBlur()'\
+    \}\
+\})\
+// we use host to subscribe events raised from this element. we supply events and their handlers using key-value pairs\
+// '(focus)':'onFocus()', - focus is the event and onFocus is the method we write in our directive class\
+\
+import \{Directive,ElementRef,Renderer\} from 'angular2/core'\
+\
+//ElementRef - used to refer/gives access to the host element from the method\
+//Renderer - its a service we use to modify that element\
+\
+ constructor(private el:ElementRef,private renderer:Renderer)\{\
+\
+    \}\
+//create a constructor to access - dependency injection , parameters are declared as private so that they are accessible by the class\
+onFocus()\{\
+this.renderer.setElementStyle(this.el.nativeElement,'width','200')\
+\}\
+the 1st argument specifies the element to which the style is to be applied\
+2nd argument specifies the style to be applied\
+and 3rd is the value\
+\
+courses.component.ts\
+\
+import \{Component\} from 'angular2/core';\
+import \{CourseService\} from './course.service'\
+import\{AutoGrowDirective\} from'./auto-grow.directive'\
+@Component(\{\
+    selector: 'courses',\
+    template: `\
+    <h2>Courses</h2>\
+    \{\{ title \}\}\
+    <input type="text" autoGrow/>\
+    <ul>\
+    <li *ngFor="#course of courses">\
+    \{\{ course \}\}\
+    </li>\
+    </ul>\
+    `,\
+    providers:[CourseService],\
+    directives:[AutoGrowDirective]\
+\})\
+export class CoursesComponent\{\
+title: String =" The title of courses page"\
+courses;\
+constructor(courseService:CourseService)\{\
+this.courses = courseService.getCourses();\
+\}\
+\}\
+\
+BINDINGS\
+\
+interpolation - property binding\
+\
+<h1>\{\{title\}\}</h1>  //interpolation\
+<h1 [textContent] = \'93title\'94/>   //property binding\
+testContent - is the property of a DOM element\
+\
+we can represent property binding in 2 diff ways\
+1) <img [src] = \'93imageUrl\'94/>\
+2)<img bind-src=\'93imageUrl\'94/>\
+\
+note -the property binding works one way, from component to DOM\
+changes in DOM , such as user entering text ,will not update the property of the component \
+we have 2 way binding for that\
+\
+class binding\
+\
+@Component(\{\
+    selector: 'my-app',\
+    template: `<h1>Hi Buddy</h1>\
+    \cb2 <button class="btn btn-primary" [class.active]="isActive">Submit</button>\cb1 \
+    <courses></courses>\
+    <authors></authors>`,\
+    directives: [CoursesComponent,AuthorsComponent]\
+\})\
+export class AppComponent \{ \
+    isActive = true;\
+\}\
+\
+Style binding\
+\
+<button class="btn btn-primary" [style.backgroundColor]="isActive ? 'blue':'green'">Submit</button>\
+    \
+//style.backgroundColor - property\
+//"isActive ? 'blue':'green'" - binding expression, if its active- blue else green\
+\
+Event Binding\
+\
+we have 2 ways to represent event binding\
+\
+<button (click)="onClick()">Submit</button>\
+<button on-click="onClick()">Submit</button>\
+\
+onClick() is a method in the component class to which the event is being blinded\
+\
+note [] for property binding, () for event binding\
+<button (click)="onClick($event)">Submit</button>\
+<button on-click="onClick($event)">Submit</button>\
+\
+export class AppComponent \{ \
+    isActive = false;\
+    onClick($event)\{\
+        console.log("clicked",event);\
+    \}\
+\}\
+\
+to associate the DOM event we pass the $event object, we can even have custom events.\
+sample console output : \
+clicked MouseEvent \{isTrusted: true, screenX: 182, screenY: 175, clientX: 180, clientY: 78\'85\}    \
+\
+event propagation\
+@Component(\{\
+<div (click)="onDivClick()\'94>\
+    <button on-click="onClick($event)">Submit</button>\
+    </div>\
+\})\
+\
+export class AppComponent \{ \
+    isActive = false;\
+    onDivClick()\{\
+        console.log("Handled by Div");\
+    \}\
+    onClick($event)\{\
+        console.log("clicked",event);\
+    \}\
+\}\
+\
+here on click of the button , the method associated with it is triggered. after that its propagated to the div , where the method associated with div click is triggered and so on.\
+\
+to stop further propagation \
+export class AppComponent \{ \
+    isActive = false;\
+    onDivClick()\{\
+        console.log("Handled by Div");\
+    \}\
+    onClick($event)\{\
+        \cb2 $event.stopPropagation();\cb1 \
+        console.log("clicked",event);\
+    \}\
+\}\
+\
+Two-Way binding\
+we have a directive called ngModel to call two way binding\
+<input type="text" [value]="title" (input)="title is $event.target.value />\
+    \
+$event.target.value - //event object to the target object that raised the event to its value\
+\
+<input type="text" [(ngModel)]="title"/>\
+\
+square brackets- property binding , paranthesis - event binding \
+[(ngModel)]="title" = [value]="title" (input)="title is $event.target.value\
+\
+[(ngModel)]="title" can also be represented by bindon-ngModel\
+\
+<input type="text" [value]="title" (input)="title = $event.target.value" />\
+    <input type="text" [(ngModel)]="title"/>\
+    <input type="text" bindon-ngModel="title"/>\
+    <input type="button" (click)="title = ''" value="clear"/>\
+    \
+import \{Component\} from 'angular2/core'\
+\
+@Component(\{\
+    selector:'star',\
+    template:`\
+    <i \
+    class="glyphicon" \
+    [class.glyphicon-star-empty]="!isFavourite" - //class binding with conditional rendering\
+    [class.glyphicon-star]="isFavourite"\
+    (click)="onClick">\
+    </i>`\
+\})\
+export class StarComponent\{\
+    isFavourite=false;\
+onClick()\{\
+this.isFavourite = !this.isFavourite\
+\}\
+\}\
+\
+
+\b \cf3 Component API
+\b0 \cf0 \
+\
+re-usable components\
+\
+<favourite\
+[isFavourite=\'93\'85\'94\
+(change)=\'93\'85\'94>\
+</favourite>\
+\
+data\'97>input \{ \} public API of component output \'97>event\
+\
+input decorator\
+@input()\
+\
+we have 2 approaches \
+1. import \{Component, \cb2 Input\cb1 \} from 'angular2/core'\
+and then \
+export class StarComponent\{\
+   \cb2 @Input() isFavourite = false;\cb1 \
+onClick()\{\
+this.isFavourite = !this.isFavourite;\
+\}\
+\}\
+2.i\cb2 nputs:['isFavourite']\cb1 \
+//here you don\'92t need to import input decorator\
+\
+*if we want to have different name for private and public property as shown below\
+inputs:['isFavourite:is-Favourite\'92] //1st private ,2nd public name of same property\
+\
+\cb2 @Input(\'91is-Favourite\'92) isFavourite = false;\cb1 \
+//pass the string argument which you want to use as a public property\
+\pard\pardeftab720\sl420\partightenfactor0
+
+\f1\fs18 \cf0 \expnd0\expndtw0\kerning0
+(alias) Input(bindingPropertyName?: string): any\
+import Input
+\f0 \
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf0 consider the situation where the client clicks the star icon and you want to update onto a server.\
+OUTPUT properties
+\f1\fs18 \
+
+\f0\fs24 to raise an event we need to have a property of the type EventEmitter\
+\cb2 change = new EventEmitter; \cb1 //change is the name of the event created,note you need to import EventEmitter from angular2/core\
+\
+EventEmitter - class that we use to publish events\
+to expose the change event to public we need to output it \
+we do that similar to the way we do for input\
+(alias) applies here as well\
+\
+export class StarComponent\{\
+@Input() isFavourite = false;\
+\
+@Output()  change = new EventEmitter;\
+onClick()\{\
+this.isFavourite = !this.isFavourite;\
+\cb2 this.change.emit(\{newValue:this.isFavourite\});\cb1 \
+\}\
+\}\
+\
+//we are emitting the change event on click and passing the argument as the value of isFavourite\
+\
+bing the event in app-component.ts which consumes the component as \
+<star [isFavourite]="post.isFavoutite" \cb2 (change)="onFavouriteChange($event)"\cb1 ></star>\
+\
+and declare the  method \
+onFavouriteChange($event)\{\
+        console.log($event);\
+    \}\
+\
+TEMPLATES\
+we can import external templates into the components using templateUrl:\'92\'85..\'92\
+eg \cb2 templateUrl:'app/app.template.html'\cb1 ,\
+*note when we use external templates by templateUrl ,it will cause an extra HTTP request which will not happen with inline templates.\
+\
+only the 1st tym the template will be downloaded and then it will be cached\
+\
+STYLES/STYLE URLs\
+similar to templates we can have styles inline style:[ ] else we can import using styleUrls:[ ]\
+both the fields take array as input\
+\
+styles:[`\
+    .glyphicon-star\{\
+        color:orange;\
+    \}`]\
+\
+Like component implementation\
+onClick()\{\
+    this.iLike=!this.iLike;\
+    this.totalLikes += this.iLike ? 1 : -1;\
+\}\
+\
+app.component.ts\
+template:\
+\
+<like [totalLikes]="tweet.totalLikes" [iLike]="tweet.iLike"></like>\
+\
+we use property binding with the object tweet\
+tweet=\{\
+        totalLikes:10,\
+        iLike:false\
+    \}\
+\
+[class.highlighted]="myVote == 1"  //class binding, the highlighted class gets applied when the users vote is 1.\
+[class.highlighted]="myVote == -1"\
+\
+upVote()\{\
+        if (this.myVote == 1) //this way we check for the user votes and restrict to only one vote\
+            return;\
+        \
+        this.myVote++; //if its not ==1 \
+\
+        this.vote.emit(\{ myVote: this.myVote \});  //publish the event with myVote.\
+    \}\
+\
+\cb2 getbootstrap.com - media object\cb1 \
+\
+TEMPLATES\
+1. 
+\b *ngIf
+\b0 =\'93condition\'94\
+ <div *ngIf="courses.length > 0">\
+the element  and its children will not be  in the DOM\
+\
+// we can achieve the same using property binding as below\
+<div [hidden]=\'93courses.length == 0\'94>\
+but here the elements and children will be rendered to DOM but are hidden.\
+\
+its bttr to use ngIf for large element trees, [hidden] can be used for small element trees.\
+*angular can check on the DOM element changes even if they are hidden\
+\
+2.
+\b ngSwitch
+\b0 \
+\
+if(\'85)\{ \}\
+ese(\'85)\{ \}\
+\
+switch(..)\
+\{\
+	case \'85:\
+\}\
+\
+[
+\b ngSwitchWhen
+\b0 ] bind it to a value\
+ <template [ngSwitchWhen]=\cf4 "'list'"\cf0 >List View Content</template>\
+double quotes for binding , single quote to string value list.\
+\
+ngSwitchDefault - we can use this ,without binding to any value\
+\
+import \{Component, Input\} from 'angular2/core'\
+\
+@Component(\{\
+    selector:'switch',\
+    template:`\
+    <ul class="nav nav-pills">\
+    <li [class.active]="viewMode == 'map'"><a (click)="viewMode='map'">Map View</a></li>\
+    <li [class.active]="viewMode == 'list'"><a (click)="viewMode='list'">List View</a></li>\
+    <ul>\
+    <div [ngSwitch]="viewMode">\
+    <template [ngSwitchWhen]="'map'" ngSwitchDefault>Map View Content</template>\
+    <template [ngSwitchWhen]="'list'">List View Content</template>\
+    </div>\
+    `\
+\})\
+export class SwitchComponent\{\
+ @Input() viewMode ='map';\
+\}\
+\
+3.
+\b ngFor\
+
+\b0 <ul>\
+<li *ngFor="#course of courses">\
+    \{\{ course \}\}\
+</li>\
+</ul>\
+\
+//course followed by the # is the local variable and courses is the object we want to iterate.\
+\
+we can use index as below\
+<ul>\
+<li *ngFor="#course of courses,#i = index">\
+    \{\{i + 1\}\} - \{\{ course \}\}\
+</li>\
+</ul>\
+\
+using * angular will transform our <li> to a template element.\
+note for ngSwitch we dint use the *,as we have diff templates defined for us to switch upon.\
+\
+if we eliminate using * we need to replace with\
+<template ngFor [ngForOf]=\'93courses\'94 #course #i=index>\
+<li>\{\{ i = 1 \}\} - \{\{ course\}\} </li>\
+</template>\
+\
+so angular will transform the element on which we applied * into a template element.\
+\
+ \
+
+\f1\fs18 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf0 \kerning1\expnd0\expndtw0 \
+}

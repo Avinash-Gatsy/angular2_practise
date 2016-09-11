@@ -1,0 +1,18 @@
+<h1>Angular 2 Tutorial</h1>
+    
+    <star [isFavourite]="post.isFavoutite" (change)="onFavouriteChange($event)"></star>
+    <like [totalLikes]="tweet.totalLikes" [iLike]="tweet.iLike"></like>
+    <button class="btn btn-primary" [class.active]="isActive">Submit</button>
+    <button class="btn btn-primary" [style.backgroundColor]="isActive ? 'blue':'green'">Submit</button>
+    <div (click)="onDivClick()">
+    <button (click)="onClick($event)">Submit</button>
+    </div>
+    <switch [viewMode]="post.viewMode"></switch>
+    <vote [voteCount]="post.voteCount" [myVote]="post.myVote" (vote)="onVote($event)"></vote>
+    <input type="text" [value]="title" (input)="title = $event.target.value" />
+    <input type="text" [(ngModel)]="title"/>
+    <input type="text" bindon-ngModel="title"/>
+    <input type="button" (click)="title = ''" value="clear"/>
+    preview:{{title}}
+    <courses></courses>
+    <authors></authors>
